@@ -1,0 +1,26 @@
+---
+title: "p8105_hw2_td2749"
+author: "Tvisha R. Devavarapu"
+date: "2022-09-29"
+output: github_document
+---
+
+```{r Setting up tidyverse}
+library(tidyverse)
+```
+
+# Problem 2: Mr. Trash Wheel
+
+```{r Reading in the Mr. Trash Wheel Excel Sheet}
+
+#The original excel sheet consists of 533 rows and 17 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet, I have realized that NA cells in the 'Dumpster' column and the final 'Grand Total' row could be used to remove the associated rows in the process of creating a tidy/analysis-friendly sheet. By setting up a range, I have also excluded the last 3 columns as they contain only notes. 
+
+mr_trash_wheel = 
+  readxl::read_excel("data/t_w.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535", na = c("", "Grand Total")) %>%
+  drop_na(Dumpster) %>%
+  janitor::clean_names() %>%
+  
+
+view(mr_trash_wheel)
+```
+
