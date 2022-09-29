@@ -13,14 +13,14 @@ library(tidyverse)
 
 ```{r Reading in the Mr. Trash Wheel Excel Sheet}
 
-#The original excel sheet consists of 533 rows and 17 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet, I have realized that NA cells in the 'Dumpster' column and the final 'Grand Total' row could be used to remove the associated rows in the process of creating a tidy/analysis-friendly sheet. By setting up a range, I have also excluded the last 3 columns as they contain only notes. 
+#The original excel sheet consists of 533 rows and 17 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet, I have realized that NA cells in the 'Dumpster' column be used to remove the associated rows in the process of creating a tidy/analysis-friendly sheet. By setting up a range, I have excluded the last 3 columns as they contain only notes and also the last two rows (containing totals figures). 
 
 mr_trash_wheel = 
-  readxl::read_excel("data/t_w.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535", na = c("", "Grand Total")) %>%
+  readxl::read_excel("data/t_w.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N533", na = "") %>%
   drop_na(Dumpster) %>%
   janitor::clean_names() %>%
+  rename(weight = weight_tons, volume = volume_cubic_yards)
   
 
-view(mr_trash_wheel)
 ```
 
