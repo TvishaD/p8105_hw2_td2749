@@ -11,16 +11,35 @@ library(tidyverse)
 
 # Problem 2: Mr. Trash Wheel
 
-```{r Reading in the Mr. Trash Wheel Excel Sheet}
+```{r Mr. Trash Wheel}
 
-#The original excel sheet consists of 533 rows and 17 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet, I have realized that NA cells in the 'Dumpster' column be used to remove the associated rows in the process of creating a tidy/analysis-friendly sheet. By setting up a range, I have excluded the last 3 columns as they contain only notes and also the last two rows (containing totals figures). 
+#The original excel sheet consists of 533 rows and 17 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet, I have realized that NA cells in the 'Dumpster' column be used to remove the associated rows in the process of creating a tidy/analysis-friendly sheet. By setting up a range, I have excluded the last 3 columns as they contain only notes and also the last two rows (containing totals figures). The resultant sheet has 453 dumpster-specific rows and 14 columns. 
 
 mr_trash_wheel = 
   readxl::read_excel("data/t_w.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N533", na = "") %>%
   drop_na(Dumpster) %>%
   janitor::clean_names() %>%
-  rename(weight = weight_tons, volume = volume_cubic_yards)
-  
+  rename(weight = weight_tons, volume = volume_cubic_yards) %>%
+  mutate(sports_balls = as.integer(round(sports_balls)))
 
+mr_trash_wheel = mutate(mr_trash_wheel, identifier = rep("*", nrow(mr_trash_wheel)))
+  
 ```
+
+```{r Professor Trash Wheel}
+prof_trash_wheel = 
+  readxl::read_excel("data/t_w.xlsx", sheet = "Professor Trash Wheel", range = "A2:N115", na = "") %>%
+  drop_na(Dumpster) %>%
+  janitor::clean_names() %>%
+  rename(weight = weight_tons, volume = volume_cubic_yards) %>%
+  mutate(sports_balls = as.integer(round(sports_balls)))
+
+prof_trash_wheel = mutate(prof_trash_wheel, identifier = rep("#", nrow(prof_trash_wheel)))
+```
+
+```{r Joining Mr. Trash Wheel and Professor Trash Wheel}
+trash_wheel_collective = 
+  bind_rows(mr_trash_wheel, prof_trash_wheel)
+```
+
 
