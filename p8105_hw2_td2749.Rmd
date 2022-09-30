@@ -9,7 +9,7 @@ output: github_document
 library(tidyverse)
 ```
 
-# Problem 2: Mr. Trash Wheel
+# Problem 2: Trash Wheel
 
 ```{r Mr. Trash Wheel}
 
@@ -37,19 +37,20 @@ prof_trash_wheel =
 prof_trash_wheel = mutate(prof_trash_wheel, identifier = rep("#", nrow(prof_trash_wheel)))
 ```
 
-```{r Joining Mr. Trash Wheel and Professor Trash Wheel}
+```{r Binding Mr. Trash Wheel and Professor Trash Wheel}
 trash_wheel_collective = 
-  bind_rows(mr_trash_wheel, prof_trash_wheel)
+  bind_rows(mr_trash_wheel, prof_trash_wheel) #Ask about not specifying anything about stacking criteria here. 
 ```
 
-```{r}
+```{r Using group_by; unsure, include = FALSE}
+# NOT SURE. 
+
 calculated_values = 
   trash_wheel_collective %>% 
   group_by(identifier) %>% 
   summarize(total_weight = sum(weight),
             total_sports_balls = sum(sports_balls)) %>% 
-  ungroup() %>%
-  group_by(identifier)
+  ungroup()
 
 calculated_values
 ```
@@ -57,6 +58,31 @@ calculated_values
 
 Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
 
-The final dataset `trash_wheel_collective` consists of *524 observations* ranging across *15 columns*. 453 of the observations pertain to unique dumpsters associated with Mr. Trash Wheel. The remaining 71 observations pertain to the unique dumpsters associated with Professor Trash Wheel. The column names are: `dumpster` (unique dumpster number), `month`,`year`, and `date` of trash collection, `weight` of trash collected in _tons_, `volume` of trash collected in _cubic yards_, `plastic_bottles` (number?), `polystyrene` (presumably number of items), `cigarette_butts`, `glass_bottles`, `grocery_bags`, `chips_bags`, and `sports_balls` all in numbers, `homes_powered` from the energy generated through trash conversion, and a final `identifier` column for easy distinction between the Mr. Trash Wheel and Professor Trash Wheel data. 
-* The total weight of trash collected by Professor Trash Wheel was: `r `
-* The total number of sports balls collected by Mr. Trash Wheel in 2020 was: 
+The final dataset `trash_wheel_collective` consists of *524 observations* ranging across *15 columns*. 453 of the observations pertain to unique dumpsters associated with Mr. Trash Wheel. The remaining 71 observations pertain to the unique dumpsters associated with Professor Trash Wheel. The column names are: `dumpster` (unique dumpster number), `month`,`year`, and `date` of trash collection, `weight` of trash collected in _tons_, `volume` of trash collected in _cubic yards_, `plastic_bottles` (number?), `polystyrene` (presumably number of items), `cigarette_butts`, `glass_bottles`, `grocery_bags`, `chips_bags`, and `sports_balls` all in numbers, `homes_powered` from the energy generated through trash conversion, and a final `identifier` column for easy distinction between the Mr. Trash Wheel and Professor Trash Wheel data.
+
+* The total weight of trash collected by Professor Trash Wheel was: `r with(trash_wheel_collective, sum(weight[identifier == "#"]))` tons. 
+* The total number of sports balls collected by Mr. Trash Wheel in 2020 was: `r with(trash_wheel_collective, sum(sports_balls[year == 2020 | identifier == '*']))`
+
+*Is there a better way to do the above? What are the different ways?* 
+
+
+# Problem 2: FiveThirtyEight - Hack Your Way To Scientific Glory
+
+```{r Setting up "pols-month" data}
+politician_data = 
+  read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>%
+  mutate(month = recode(month, "01" = "january", "02" = "february", "03" = "march", "04" = "april", 
+                        "05" = "may", "06" = "june", "07" = "july", "08" = "august", "09" = "september",
+                        "10" = "october", "11" = "november", "12" = "december"))
+```
+
+create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+
+
+
+
+
+
