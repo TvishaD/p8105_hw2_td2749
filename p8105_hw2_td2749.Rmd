@@ -75,10 +75,13 @@ politician_data =
   separate(mon, into = c("year", "month", "day"), sep = "-") %>%
   mutate(month = recode(month, "01" = "january", "02" = "february", "03" = "march", "04" = "april", 
                         "05" = "may", "06" = "june", "07" = "july", "08" = "august", "09" = "september",
-                        "10" = "october", "11" = "november", "12" = "december"))
+                        "10" = "october", "11" = "november", "12" = "december")) %>%
+  mutate(president = recode(prez_dem, "0" = "gop", "1" = "dem")) %>%
+  select(-prez_dem, -prez_gop, -day) %>%
+  select(year, month, president, everything())
 ```
 
-create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
 
 
 
