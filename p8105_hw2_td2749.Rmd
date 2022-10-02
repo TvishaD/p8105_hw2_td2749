@@ -77,16 +77,20 @@ politician_data =
                         "05" = "may", "06" = "june", "07" = "july", "08" = "august", "09" = "september",
                         "10" = "october", "11" = "november", "12" = "december")) %>%
   mutate(president = recode(prez_dem, "0" = "gop", "1" = "dem")) %>%
+  # hold up! there is an else in this column which says neither dem nor gop? check this please. 
   select(-prez_dem, -prez_gop, -day) %>%
   select(year, month, president, everything())
 ```
 
 ```{r Setting up "snp" data}
-# HOW TO FIX THE YEAR FORMAT HERE???
 stock_data =
   read_csv("./data/fivethirtyeight_datasets/snp.csv") %>%
   janitor::clean_names() %>%
   separate(date, into = c("day", "month", "year"), sep = "/") %>%
+  mutate(year = as.numeric(year)) %>%
+  mutate(year = case_when(year < 50 ~ 2000 + year,
+                          year >= 50 ~ 1900 + year)) %>%
+  mutate(year = as.character(year)) %>%
   mutate(month = recode(month, "1" = "january", "2" = "february", "3" = "march", "4" = "april", 
                         "5" = "may", "6" = "june", "7" = "july", "8" = "august", "9" = "september",
                         "10" = "october", "11" = "november", "12" = "december")) %>%
@@ -98,6 +102,7 @@ stock_data =
 unemployment_data = 
   read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>%
   janitor::clean_names() %>%
+  mutate(year = as.character(year)) %>%
   pivot_longer(jan:dec, names_to = "month", values_to = "rate_per_year")
 ```
 
