@@ -86,11 +86,12 @@ politician_data =
 stock_data =
   read_csv("./data/fivethirtyeight_datasets/snp.csv") %>%
   janitor::clean_names() %>%
-  separate(date, into = c("day", "month", "year"), sep = "/") %>%
+  separate(date, into = c("month", "day", "year"), sep = "/") %>%
   mutate(year = as.numeric(year)) %>%
   mutate(year = case_when(year < 50 ~ 2000 + year,
                           year >= 50 ~ 1900 + year)) %>%
   mutate(year = as.character(year)) %>%
+  mutate(month = as.numeric(month)) %>%
   arrange(year, month) %>%
   mutate(month = recode(month, "1" = "january", "2" = "february", "3" = "march", "4" = "april", 
                         "5" = "may", "6" = "june", "7" = "july", "8" = "august", "9" = "september",
@@ -103,7 +104,10 @@ unemployment_data =
   read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>%
   janitor::clean_names() %>%
   mutate(year = as.character(year)) %>%
-  pivot_longer(jan:dec, names_to = "month", values_to = "rate_per_year")
+  pivot_longer(jan:dec, names_to = "month", values_to = "rate_per_year") %>%
+  mutate(month = recode(month, "jan" = "january", "feb" = "february", "mar" = "march", "apr" = "april", 
+                        "may" = "may", "jun" = "june", "jul" = "july", "aug" = "august", 
+                        "sep" = "september", "oct" = "october", "nov" = "november", "dec" = "december"))
 ```
 
 
