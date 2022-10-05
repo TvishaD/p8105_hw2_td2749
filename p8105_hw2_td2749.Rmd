@@ -9,6 +9,68 @@ output: github_document
 library(tidyverse)
 ```
 
+# Problem 1: NYC Transit Data
+
+```{r Setting Up}
+nyc_transit = 
+  read_csv("data/nyc_transit.csv",
+           col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c")) %>%
+  janitor::clean_names() %>%
+  select(line, station_name, station_latitude, station_longitude, starts_with("route"), 
+         entry, exit_only, vending, entrance_type, ada) %>%
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
+```
+
+As is, there are 1868 observations across 20 variables. The data is not fully tidy. The route number colums could be made into a single route variable (pivot long). 
+
+```{r Identifying Unique Stations}
+nyc_transit %>% 
+  select(station_name, line) %>% 
+  distinct
+```
+
+There are 465 unique stations. 
+
+```{r ADA Compliance}
+nyc_transit %>% 
+  filter(ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct
+```
+
+84 stations are ADA Compliant. 
+
+```{r Entrance/Exit Proportions and Vending}
+nyc_transit %>% 
+  filter(vending == "NO") %>% 
+  pull(entry) %>% 
+  mean
+```
+
+Mean = 0.377
+
+```{r A Train and ADA Compliance}
+nyc_transit %>% 
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") %>% 
+  filter(route == "A") %>% 
+  select(station_name, line) %>% 
+  distinct
+
+nyc_transit %>% 
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") %>% 
+  filter(route == "A", ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct
+```
+
+17
+
 # Problem 2: Trash Wheel
 The original Mr. Trash Wheel excel sheet consists of 550 rows and 14 columns. Upon examination of the entire 'Mr. Trash Wheel' sheet in the newly updated file, I have realized that the required data is listed in continuous rows with no unnecessary breaks that would hinder the generation of a tidy/analysis-friendly sheet. Hence, I excluded the first row (image) and last row (totals) of the original sheet, which leaves us 548 rows including the first row with variable names. The resultant sheet has 547 dumpster-specific rows and 15 columns of variables (the last one is the identifier I have generated for the binding purpose. (Note: I removed the drop_na(Dumpster) component which was relevant for the earlier data set. As it is not serving any purpose here due to lack of empty cells in the 'dumpster' column, I have deleted it from the current code.)
 
