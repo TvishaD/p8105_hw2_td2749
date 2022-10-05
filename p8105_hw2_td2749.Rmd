@@ -9,7 +9,7 @@ output: github_document
 library(tidyverse)
 ```
 
-# Problem 1: NYC Transit Data
+## Problem 1: NYC Transit Data (Practice)
 
 ```{r Setting Up}
 nyc_transit = 
