@@ -26,7 +26,8 @@ mr_trash_wheel = mutate(mr_trash_wheel, identifier = rep("*", nrow(mr_trash_whee
 prof_trash_wheel = 
   readxl::read_excel("data/new_t_w.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") %>%
   janitor::clean_names() %>%
-  rename(weight_in_tons = weight_tons, volume_in_cubic_yards = volume_cubic_yards)
+  rename(weight_in_tons = weight_tons, volume_in_cubic_yards = volume_cubic_yards) %>%
+  mutate(year = as.character(year))
 
 prof_trash_wheel = mutate(prof_trash_wheel, identifier = rep("#", nrow(prof_trash_wheel)))
 
@@ -34,10 +35,10 @@ prof_trash_wheel = mutate(prof_trash_wheel, identifier = rep("#", nrow(prof_tras
 
 ```{r Binding Mr. Trash Wheel and Professor Trash Wheel}
 trash_wheel_collective = 
-  plyr::rbind.fill(mr_trash_wheel, prof_trash_wheel)
+  bind_rows(mr_trash_wheel, prof_trash_wheel)
 ```
 
-The final dataset `trash_wheel_collective` consists of *641 observations* ranging across *15 columns*. 547 of the observations pertain to unique dumpsters associated with Mr. Trash Wheel. The remaining 94 observations pertain to the unique dumpsters associated with Professor Trash Wheel. The column names are: `dumpster` (unique dumpster number), `month`,`year`, and `date` of trash collection, `weight_in_tons` of trash collected, `volume_in_cubic_yards` of trash collected, `plastic_bottles` (number?), `polystyrene` (presumably number of items), `cigarette_butts`, `glass_bottles`, `grocery_bags`, `chips_bags`, and `sports_balls` all in numbers, `homes_powered` from the energy generated through trash conversion, and a final `identifier` column for easy distinction between the Mr. Trash Wheel and Professor Trash Wheel data.
+The final dataset `trash_wheel_collective` consists of *641 observations* ranging across *15 columns*. 547 of the observations pertain to unique dumpsters associated with Mr. Trash Wheel. The remaining 94 observations pertain to the unique dumpsters associated with Professor Trash Wheel. The column names are: `dumpster` (unique dumpster number), `month`,`year`, and `date` of trash collection, `weight_in_tons` of trash collected, `volume_in_cubic_yards` of trash collected, `plastic_bottles` (number?), `polystyrene` (presumably number of items), `cigarette_butts`, `glass_bottles`, `grocery_bags`, `chips_bags`, and `sports_balls` all in numbers, `homes_powered` from the energy generated through trash conversion, and a final `identifier` column for easy distinction between the Mr. Trash Wheel and Professor Trash Wheel data in the trash_wheel_collective data.
 
 * The total weight of trash collected by Professor Trash Wheel was: `r with(trash_wheel_collective, sum(weight_in_tons[identifier == "#"]))` tons. 
 * The total number of sports balls collected by Mr. Trash Wheel in 2020 was: `r with(trash_wheel_collective, sum(sports_balls[year == 2020 & identifier == '*']))`
@@ -57,6 +58,8 @@ politician_data =
   select(-prez_dem, -prez_gop, -day) %>%
   select(year, month, president, everything())
 ```
+In the cleaning process above, I used the `prez_dem` column to code for the newly-made `president` column as this enabled a simple set up of associating '0' with gop and '1' with dem. The `prez_gop` column was not used for this process as it contained an additional value of 2 within rows pertaining to 15/08/74 - 15/12/74. Upon reading, I have learned that this was the time period when Republican VP Ford was declared President as the existing Republican president Nixon was forced to resign due to the Watergate Scandal. In terms of my decision to code for the `president` colum via the `prez_dem` column, this adds up as the associated time would rightly be identified as `gop` as both Nixon and Ford were Republicans.
+
 
 ```{r Setting up "snp" data}
 stock_data =
@@ -72,6 +75,7 @@ stock_data =
   mutate(month = recode(month, "1" = "january", "2" = "february", "3" = "march", "4" = "april", 
                         "5" = "may", "6" = "june", "7" = "july", "8" = "august", "9" = "september",
                         "10" = "october", "11" = "november", "12" = "december")) %>%
+  rename(snp_closing_value = close) %>%
   select(year, month, everything())
 ```
 
@@ -80,16 +84,21 @@ unemployment_data =
   read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>%
   janitor::clean_names() %>%
   mutate(year = as.character(year)) %>%
-  pivot_longer(jan:dec, names_to = "month", values_to = "rate_per_year") %>%
+  pivot_longer(jan:dec, names_to = "month", values_to = "unemp_%_per_month") %>%
   mutate(month = recode(month, "jan" = "january", "feb" = "february", "mar" = "march", "apr" = "april", 
                         "may" = "may", "jun" = "june", "jul" = "july", "aug" = "august", 
                         "sep" = "september", "oct" = "october", "nov" = "november", "dec" = "december"))
 ```
 
-```{r Joining the datasets}
-right_join(politician_data, stock_data, by = c("year", "month")) 
+```{r Joining pols and snp}
+pols_snp = inner_join(politician_data, stock_data, by = c("year", "month"))
+#As the day column from the snp sheet becomes somewhat irrelevant in the larger scheme of this situation, I will remove it: 
+pols_snp = select(pols_snp, -day)
 ```
 
+```{r Joining pols+snp with unemployment}
+pols_snp_unemp = left_join(pols_snp, unemployment_data, by = c("year", "month"))
+```
 
 
 
