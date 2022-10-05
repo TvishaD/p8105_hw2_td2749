@@ -5,7 +5,7 @@ date: "2022-09-29"
 output: github_document
 ---
 
-```{r Setting up tidyverse}
+```{r Setting up tidyverse, message = FALSE}
 library(tidyverse)
 ```
 
@@ -46,7 +46,7 @@ The final dataset `trash_wheel_collective` consists of *641 observations* rangin
 
 # Problem 2: FiveThirtyEight - Hack Your Way To Scientific Glory
 
-```{r Setting up "pols-month" data}
+```{r Setting up "pols-month" data, message = FALSE}
 politician_data = 
   read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>%
   janitor::clean_names() %>%
@@ -61,7 +61,7 @@ politician_data =
 In the cleaning process above, I used the `prez_dem` column to code for the newly-made `president` column as this enabled a simple set up of associating '0' with gop and '1' with dem. The `prez_gop` column was not used for this process as it contained an additional value of 2 within rows pertaining to 15/08/74 - 15/12/74. Upon reading, I have learned that this was the time period when Republican VP Ford was declared President as the existing Republican president Nixon was forced to resign due to the Watergate Scandal. In terms of my decision to code for the `president` colum via the `prez_dem` column, this adds up as the associated time would rightly be identified as `gop` as both Nixon and Ford were Republicans.
 
 
-```{r Setting up "snp" data}
+```{r Setting up "snp" data, message = FALSE}
 stock_data =
   read_csv("./data/fivethirtyeight_datasets/snp.csv") %>%
   janitor::clean_names() %>%
@@ -79,7 +79,7 @@ stock_data =
   select(year, month, everything())
 ```
 
-```{r Setting up "unemployment" data}
+```{r Setting up "unemployment" data, message = FALSE}
 unemployment_data = 
   read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>%
   janitor::clean_names() %>%
@@ -101,12 +101,12 @@ pols_snp_unemp = left_join(pols_snp, unemployment_data, by = c("year", "month"))
 ```
 
 
-* Upon tidying, the `pols` dataset which I initially refer to as the `politician data` consists of **`r nrow(politician_data)` rows and `r ncol(politician_data)` columns**. These columns are:  _'`r colnames(politician_data)`'_. Starting from **1947 January** and going on upto **2015 June**, this data essentially provides monthly information on the constitutional make-up (number of governors, senators, and representatives - all either Republican or Democratic) of the ruling-government.
+* Upon tidying, the `pols` dataset which I initially refer to as the `politician data` consists of **`r nrow(politician_data)` rows of observations and `r ncol(politician_data)` columns**. These columns are:  _'`r colnames(politician_data)`'_. Starting from **1947 January** and going on upto **2015 June**, this data essentially provides monthly information on the constitutional make-up (number of governors, senators, and representatives - all either Republican or Democratic) of the ruling-government.
 
-* Upon tidying, the `snp` dataset which I initially refer to as the `stock data` consists of **`r nrow(stock_data)` rows and `r ncol(stock_data)` columns**. These columns are:  _'`r colnames(stock_data)`'_. This data entails the closing values of the S&P stock index on a monthly manner from **1950 January** to **2015 July**. 
+* Upon tidying, the `snp` dataset which I initially refer to as the `stock data` consists of **`r nrow(stock_data)` rows of observations and `r ncol(stock_data)` columns**. These columns are:  _'`r colnames(stock_data)`'_. This data entails the closing values of the S&P stock index on a monthly manner from **1950 January** to **2015 July**. 
 
-* Upon tidying, the `unemployment` dataset which I initially refer to as the `unemployment data` consists of **`r nrow(unemployment_data)` rows and `r ncol(unemployment_data)` columns**. These columns are:  _'`r colnames(unemployment_data)`'_. This data provides information on the percentage of unemployment per month from **1948 January** to **2015 June**. 
+* Upon tidying, the `unemployment` dataset which I initially refer to as the `unemployment data` consists of **`r nrow(unemployment_data)` rows of observations and `r ncol(unemployment_data)` columns**. These columns are:  _'`r colnames(unemployment_data)`'_. This data provides information on the percentage of unemployment per month from **1948 January** to **2015 June**. 
 
 
-For the joins, I first performed an `inner_join` while connecting the stock data to the politician data. As the stock data only begins from 1950 January and goes on every month till 2015 July while politician data begins from 1947 January and goes on every month till 2015 June, it seemed meaningful to perform an inner join and attach the overlapping months given the potential purpose of analysing trends between the governmental make-up and the stock closing values. As a result, the `pols_snp` dataset has **`r nrow(pols_snp)` rows and `r ncol(pols_snp)` columns**. The p`pols_snp` data ranges from 1950 January to 2015 June. 
-The unemployment data contains 6 rows at the end with no associated percentage values; these were excluded in the process of performing a `left_join` of this onto the `pols_snp` for the creation of `pols_snp_unemp` dataset. This dataset has **`r nrow(pols_snp_unemp)` rows and `r ncol(pols_snp_unemp)` columns**. As the unemployment data ranges from 1948 January to 2015 June (exluding the last few rows with no percentage values), and the `pols_snp` data ranges from 1950 January to 2015 June, the left join was performed to retain all the overlapping information on the basis of the smaller-sized `pols-snp` data. As a result, there are the same `r nrow(pols_snp_unemp)` rows as in the `pols_snp` set but an additional column consisting of unemployment rates. This dataset contains information from 2015 January to 2015 June. 
+For the joins, I first performed an `inner_join` while connecting the stock data to the politician data. As the stock data only begins from 1950 January and goes on every month till 2015 July while politician data begins from 1947 January and goes on every month till 2015 June, it seemed meaningful to perform an inner join and attach the overlapping months given the potential purpose of analysing trends between the governmental make-up and the stock closing values. As a result, the `pols_snp` dataset has **`r nrow(pols_snp)` rows of observations and `r ncol(pols_snp)` columns**. The p`pols_snp` data ranges from 1950 January to 2015 June. 
+The unemployment data contains 6 rows at the end with no associated percentage values; these were excluded in the process of performing a `left_join` of this onto the `pols_snp` for the creation of `pols_snp_unemp` dataset. This dataset has **`r nrow(pols_snp_unemp)` rows of observations and `r ncol(pols_snp_unemp)` columns**. As the unemployment data ranges from 1948 January to 2015 June (exluding the last few rows with no percentage values), and the `pols_snp` data ranges from 1950 January to 2015 June, the left join was performed to retain all the overlapping information on the basis of the smaller-sized `pols-snp` data. As a result, there are the same `r nrow(pols_snp_unemp)` rows as in the `pols_snp` set but an additional column consisting of unemployment rates. This dataset contains information from 2015 January to 2015 June. 
